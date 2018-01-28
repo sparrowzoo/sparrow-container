@@ -15,11 +15,12 @@
  * limitations under the License.
  */
 
-package com.sparrow.container;
+package com.sparrow.container.impl;
 
 import com.sparrow.cg.Generator4MethodAccessor;
 import com.sparrow.cg.MethodAccessor;
 import com.sparrow.constant.magic.SYMBOL;
+import com.sparrow.container.BeanDefinition;
 import com.sparrow.core.TypeConverter;
 import com.sparrow.exception.DuplicateActionMethodException;
 import com.sparrow.utility.StringUtility;
@@ -36,44 +37,44 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * Created by harry on 2018/1/19.
  */
-public class ParseContext {
+class ParseContext {
 
-    protected   Logger logger = LoggerFactory.getLogger(this.getClass());
+    Logger logger = LoggerFactory.getLogger(this.getClass());
 
-    protected static final String DTD_FILE_NAME = "beanFactory.dtd";
-    protected static final String NAME = "name";
-    protected static final String VALUE = "value";
-    protected static final String REF = "ref";
-    protected static final String SCOPE = "scope";
-    protected static final String CLASS_NAME = "class";
-    protected static final String BEAN = "bean";
-    protected static final String IMPORT = "import";
-    protected static final String BEANS = "beans";
-    protected static final String SINGLETON = "singleton";
-    protected static final String PROPERTY = "property";
+    static final String DTD_FILE_NAME = "beanFactory.dtd";
+    static final String NAME = "name";
+    static final String VALUE = "value";
+    static final String REF = "ref";
+    static final String SCOPE = "scope";
+    static final String CLASS_NAME = "class";
+    static final String BEAN = "bean";
+    static final String IMPORT = "import";
+    static final String BEANS = "beans";
+    static final String SINGLETON = "singleton";
+    static final String PROPERTY = "property";
 
     /**
      * bean definition缓存
      */
-    protected final Map<String, BeanDefinition> beanDefinitionMap = new ConcurrentHashMap<String, BeanDefinition>();
+    final Map<String, BeanDefinition> beanDefinitionMap = new ConcurrentHashMap<String, BeanDefinition>();
 
-    protected Generator4MethodAccessor generator4MethodAccessor = null;
+    Generator4MethodAccessor generator4MethodAccessor = null;
     /**
      * 对象缓存
      */
-    protected final Map<String, Object> beanFactoryCache = new ConcurrentHashMap<String, Object>();
+    final Map<String, Object> beanFactoryCache = new ConcurrentHashMap<String, Object>();
     /**
      * impl 生成的代理bean的缓存
      */
-    protected final Map<String, MethodAccessor> proxyBeanCache = new ConcurrentHashMap<String, MethodAccessor>();
+    final Map<String, MethodAccessor> proxyBeanCache = new ConcurrentHashMap<String, MethodAccessor>();
     /**
      * 实体的field 访问方法缓存
      */
-    protected final Map<String, List<TypeConverter>> fieldCache = new ConcurrentHashMap<String, List<TypeConverter>>();
+    final Map<String, List<TypeConverter>> fieldCache = new ConcurrentHashMap<String, List<TypeConverter>>();
     /**
      * controller实体对象的操作方法缓存
      */
-    protected final Map<String, Map<String, Method>> controllerMethodCache = new ConcurrentHashMap<String, Map<String, Method>>();
+    final Map<String, Map<String, Method>> controllerMethodCache = new ConcurrentHashMap<String, Map<String, Method>>();
     /**
      * 拦截器
      */
@@ -81,8 +82,7 @@ public class ParseContext {
     /**
      * bean分类
      */
-    protected final Map<String, Map<String, Object>> typeBeanFactory = new ConcurrentHashMap<String, Map<String, Object>>();
-
+    final Map<String, Map<String, Object>> typeBeanFactory = new ConcurrentHashMap<String, Map<String, Object>>();
 
     @SuppressWarnings("unchecked")
     public <T> T getBean(String beanName) {
@@ -102,7 +102,7 @@ public class ParseContext {
         try {
             // 类的元数据
             BeanDefinition beanDefinition = this.beanDefinitionMap
-                    .get(beanName);
+                .get(beanName);
             // 获取当前类
             Class<?> beanClass = beanDefinition.getBeanClass();
             // 初始化当前对象
@@ -115,7 +115,7 @@ public class ParseContext {
             // 注入依赖对象
             if (beanDefinition.getRelyOnClass().size() != 0) {
                 Iterator<String> bit = beanDefinition.getRelyOnClass()
-                        .keySet().iterator();
+                    .keySet().iterator();
                 String key;
                 while (bit.hasNext()) {
                     key = bit.next();
@@ -128,17 +128,16 @@ public class ParseContext {
         }
     }
 
-
     /**
      * 注入
      *
      * @param currentObject 对象
-     * @param beanName      依赖bean name
-     * @param reference     依赖的bean
+     * @param beanName 依赖bean name
+     * @param reference 依赖的bean
      * @throws Exception
      */
-    protected  <T> void setReference(T currentObject, String beanName, T reference)
-            throws Exception {
+    <T> void setReference(T currentObject, String beanName, T reference)
+        throws Exception {
         // set bean class
         Class<?> setBeanClazz = null;
         if (reference != null) {
@@ -161,20 +160,20 @@ public class ParseContext {
             for (Class<?> interfaceClazz : interfaces) {
                 try {
                     method = currentClass.getMethod(setBeanMethod,
-                            interfaceClazz);
+                        interfaceClazz);
                     break;
                 } catch (NoSuchMethodException ex) {
                     Class<?>[] superClass = interfaceClazz.getInterfaces();
                     if (superClass != null && superClass.length > 0) {
                         try {
                             method = currentClass.getMethod(setBeanMethod,
-                                    superClass[0]);
+                                superClass[0]);
                         } catch (NoSuchMethodException e1) {
                             logger.error(setBeanMethod
-                                    + " method not found!", e1);
+                                + " method not found!", e1);
                         } catch (NullPointerException e2) {
                             logger.error(interfaceClazz
-                                    + " interface not found!", e2);
+                                + " interface not found!", e2);
                         }
                     }
                 }
@@ -184,15 +183,16 @@ public class ParseContext {
             method.invoke(currentObject, reference);
         }
     }
+
     /**
      * 注入
      *
-     * @param currentObject  对象
-     * @param propertyName   依赖
-     * @param value          value
-     *  placeHolderKey place hold key 由maven pom 管理
+     * @param currentObject 对象
+     * @param propertyName 依赖
+     * @param value value placeHolderKey place hold key 由maven pom 管理
      */
-    protected  <T> void setValue(T currentObject, String propertyName, String value) throws InvocationTargetException, IllegalAccessException {
+    <T> void setValue(T currentObject, String propertyName,
+        String value) throws InvocationTargetException, IllegalAccessException {
         // set方法
         String setBeanMethod = StringUtility.getSetMethodNameByField(propertyName);
         Class<?> currentClass = currentObject.getClass();
@@ -210,14 +210,14 @@ public class ParseContext {
                     method = currentClass.getMethod(setBeanMethod, Boolean.class);
                     method.invoke(currentClass, Boolean.valueOf(value));
                 } catch (NoSuchMethodException e1) {
-                   logger.error("no method",e1);
+                    logger.error("no method", e1);
                 }
             }
         }
     }
 
     protected Object getInstance(String constructorArg,
-                               Class<?> beanClass) throws Exception{
+        Class<?> beanClass) throws Exception {
         if (StringUtility.isNullOrEmpty(constructorArg)) {
             return beanClass.newInstance();
         }
@@ -269,7 +269,7 @@ public class ParseContext {
         return generator4MethodAccessor;
     }
 
-    protected void assembleController(String beanName, String controller, Class<?> beanClass) {
+    void assembleController(String beanName, String controller, Class<?> beanClass) {
         if (!Boolean.TRUE.toString().equalsIgnoreCase(controller)) {
             return;
         }
@@ -287,14 +287,13 @@ public class ParseContext {
         this.controllerMethodCache.put(beanName, methodMap);
     }
 
-
     /**
      * bean definition cache
      *
-     * @param beanName  xml config
+     * @param beanName xml config
      * @param beanClass class
      */
-    protected void cacheBeanDefinition(String beanName, Class beanClass) {
+    void cacheBeanDefinition(String beanName, Class beanClass) {
         String clazzName = beanClass.getSimpleName();
         BeanDefinition beanDefinition = new BeanDefinition(beanClass);
         this.beanDefinitionMap.put(beanName, beanDefinition);
