@@ -80,7 +80,7 @@ public class DocumentParser extends ParseContext{
     }
 
     /**
-     * 读xml标签初始化bean 并加入到bean factory 和bean defination facotory
+     * 读xml标签初始化bean 并加入到bean factory 和bean definition factory
      */
     protected Object parseBean(Element element, String beanName) {
         // 是否为单子实例

@@ -138,9 +138,19 @@ public class SparrowContainerImpl extends DocumentParser implements Container {
     public Map<String, Object> getAllBean() {
         return this.beanFactoryCache;
     }
+    @Override
+    public void init(){
+        this.init(null,null);
+    }
 
     @Override
-    public void init() {
+    public void init(String xmlName, String systemConfigPath) {
+        if(!StringUtility.isNullOrEmpty(xmlName)){
+            this.xmlName=xmlName;
+        }
+        if(!StringUtility.isNullOrEmpty(systemConfigPath)){
+            this.systemConfigPath=systemConfigPath;
+        }
         logger.info("-----------------Ioc container init ....-------------------");
         try {
             logger.info("-------------system config file init ...-------------------");
@@ -175,6 +185,7 @@ public class SparrowContainerImpl extends DocumentParser implements Container {
         Config.initSystem(this.systemConfigPath);
         String internationalization = Config
                 .getValue(CONFIG.INTERNATIONALIZATION);
+
         if (StringUtility.isNullOrEmpty(internationalization)) {
             internationalization = Config
                     .getValue(CONFIG.LANGUAGE);

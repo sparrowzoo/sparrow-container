@@ -58,7 +58,7 @@ class ParseContext {
      */
     final Map<String, BeanDefinition> beanDefinitionMap = new ConcurrentHashMap<String, BeanDefinition>();
 
-    Generator4MethodAccessor generator4MethodAccessor = null;
+    private Generator4MethodAccessor generator4MethodAccessor = null;
     /**
      * 对象缓存
      */
@@ -134,7 +134,6 @@ class ParseContext {
      * @param currentObject 对象
      * @param beanName 依赖bean name
      * @param reference 依赖的bean
-     * @throws Exception
      */
     <T> void setReference(T currentObject, String beanName, T reference)
         throws Exception {
