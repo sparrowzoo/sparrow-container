@@ -117,6 +117,7 @@ public class DocumentParser extends ParseContext{
                 return null;
             }
             assembleController(beanName, controller, beanClass);
+            //为与sparrow mvc解耦，这里引不到handlerInterceptor接口
             if (Boolean.TRUE.toString().equalsIgnoreCase(interceptor)) {
                 container = CONTAINER.INTERCEPTOR.toString().toUpperCase();
             }

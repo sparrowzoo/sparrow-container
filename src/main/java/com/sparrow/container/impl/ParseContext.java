@@ -60,7 +60,7 @@ class ParseContext {
 
     private Generator4MethodAccessor generator4MethodAccessor = null;
     /**
-     * 对象缓存
+     * 对象缓存(ALL 包含typeBeanFactory)
      */
     final Map<String, Object> beanFactoryCache = new ConcurrentHashMap<String, Object>();
     /**
@@ -75,10 +75,6 @@ class ParseContext {
      * controller实体对象的操作方法缓存
      */
     final Map<String, Map<String, Method>> controllerMethodCache = new ConcurrentHashMap<String, Map<String, Method>>();
-    /**
-     * 拦截器
-     */
-    protected final List<Object> interceptorList = new ArrayList<Object>();
     /**
      * bean分类
      */
