@@ -49,8 +49,6 @@ import java.util.Map;
 public class SparrowContainerImpl extends DocumentParser implements Container {
 
 
-    private String xmlName;
-    private String systemConfigPath;
 
     public SparrowContainerImpl(String xmlName,String systemConfigPath) {
         this.xmlName =xmlName;
@@ -163,7 +161,7 @@ public class SparrowContainerImpl extends DocumentParser implements Container {
             }
             logger.info("-------------init initializer ...--------------------------");
             Initializer initializer = this.getBean(
-                    SYS_OBJECT_NAME.INITIALIZER_SERVER);
+                    SYS_OBJECT_NAME.INITIALIZER);
 
             if (initializer != null) {
                 initializer.init(this);

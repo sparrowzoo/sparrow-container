@@ -19,12 +19,16 @@ package com.sparrow.container.impl;
 
 import com.sparrow.cg.Generator4MethodAccessor;
 import com.sparrow.cg.MethodAccessor;
+import com.sparrow.constant.SYS_OBJECT_NAME;
 import com.sparrow.constant.magic.SYMBOL;
 import com.sparrow.container.BeanDefinition;
 import com.sparrow.core.TypeConverter;
 import com.sparrow.exception.DuplicateActionMethodException;
+import com.sparrow.utility.Config;
 import com.sparrow.utility.StringUtility;
+
 import java.lang.reflect.InvocationTargetException;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,6 +44,10 @@ import java.util.concurrent.ConcurrentHashMap;
 class ParseContext {
 
     Logger logger = LoggerFactory.getLogger(this.getClass());
+
+    String xmlName;
+    String systemConfigPath;
+
 
     static final String DTD_FILE_NAME = "beanFactory.dtd";
     static final String NAME = "name";
@@ -81,6 +89,17 @@ class ParseContext {
     final Map<String, Map<String, Object>> typeBeanFactory = new ConcurrentHashMap<String, Map<String, Object>>();
 
     @SuppressWarnings("unchecked")
+    public <T> T getBean(SYS_OBJECT_NAME objectName) {
+        String defaultBeanName=StringUtility.toHump(objectName.name().toLowerCase(),"_");
+        String beanName = Config.getValue(objectName.name().toLowerCase(),defaultBeanName);
+        T obj = this.getBean(beanName);
+        if (obj == null) {
+            throw new RuntimeException(beanName + "not exist,please config ["+defaultBeanName+"] in "+this.systemConfigPath);
+        }
+        return obj;
+    }
+
+    @SuppressWarnings("unchecked")
     public <T> T getBean(String beanName) {
         if (beanName == null) {
             return null;
@@ -98,7 +117,7 @@ class ParseContext {
         try {
             // 类的元数据
             BeanDefinition beanDefinition = this.beanDefinitionMap
-                .get(beanName);
+                    .get(beanName);
             // 获取当前类
             Class<?> beanClass = beanDefinition.getBeanClass();
             // 初始化当前对象
@@ -111,7 +130,7 @@ class ParseContext {
             // 注入依赖对象
             if (beanDefinition.getRelyOnClass().size() != 0) {
                 Iterator<String> bit = beanDefinition.getRelyOnClass()
-                    .keySet().iterator();
+                        .keySet().iterator();
                 String key;
                 while (bit.hasNext()) {
                     key = bit.next();
@@ -128,11 +147,11 @@ class ParseContext {
      * 注入
      *
      * @param currentObject 对象
-     * @param beanName 依赖bean name
-     * @param reference 依赖的bean
+     * @param beanName      依赖bean name
+     * @param reference     依赖的bean
      */
     <T> void setReference(T currentObject, String beanName, T reference)
-        throws Exception {
+            throws Exception {
         // set bean class
         Class<?> setBeanClazz = null;
         if (reference != null) {
@@ -155,20 +174,20 @@ class ParseContext {
             for (Class<?> interfaceClazz : interfaces) {
                 try {
                     method = currentClass.getMethod(setBeanMethod,
-                        interfaceClazz);
+                            interfaceClazz);
                     break;
                 } catch (NoSuchMethodException ex) {
                     Class<?>[] superClass = interfaceClazz.getInterfaces();
                     if (superClass != null && superClass.length > 0) {
                         try {
                             method = currentClass.getMethod(setBeanMethod,
-                                superClass[0]);
+                                    superClass[0]);
                         } catch (NoSuchMethodException e1) {
                             logger.error(setBeanMethod
-                                + " method not found!", e1);
+                                    + " method not found!", e1);
                         } catch (NullPointerException e2) {
                             logger.error(interfaceClazz
-                                + " interface not found!", e2);
+                                    + " interface not found!", e2);
                         }
                     }
                 }
@@ -183,11 +202,11 @@ class ParseContext {
      * 注入
      *
      * @param currentObject 对象
-     * @param propertyName 依赖
-     * @param value value placeHolderKey place hold key 由maven pom 管理
+     * @param propertyName  依赖
+     * @param value         value placeHolderKey place hold key 由maven pom 管理
      */
     <T> void setValue(T currentObject, String propertyName,
-        String value) throws InvocationTargetException, IllegalAccessException {
+                      String value) throws InvocationTargetException, IllegalAccessException {
         // set方法
         String setBeanMethod = StringUtility.getSetMethodNameByField(propertyName);
         Class<?> currentClass = currentObject.getClass();
@@ -212,7 +231,7 @@ class ParseContext {
     }
 
     protected Object getInstance(String constructorArg,
-        Class<?> beanClass) throws Exception {
+                                 Class<?> beanClass) throws Exception {
         if (StringUtility.isNullOrEmpty(constructorArg)) {
             return beanClass.newInstance();
         }
@@ -285,7 +304,7 @@ class ParseContext {
     /**
      * bean definition cache
      *
-     * @param beanName xml config
+     * @param beanName  xml config
      * @param beanClass class
      */
     void cacheBeanDefinition(String beanName, Class beanClass) {
