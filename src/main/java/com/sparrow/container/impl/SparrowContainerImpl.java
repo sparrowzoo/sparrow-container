@@ -48,8 +48,6 @@ import java.util.Map;
  */
 public class SparrowContainerImpl extends DocumentParser implements Container {
 
-
-
     public SparrowContainerImpl(String xmlName,String systemConfigPath) {
         this.xmlName =xmlName;
         this.systemConfigPath = systemConfigPath;
