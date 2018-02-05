@@ -48,7 +48,6 @@ class ParseContext {
     String xmlName;
     String systemConfigPath;
 
-
     static final String DTD_FILE_NAME = "beanFactory.dtd";
     static final String NAME = "name";
     static final String VALUE = "value";
@@ -60,10 +59,10 @@ class ParseContext {
     static final String BEANS = "beans";
     static final String SINGLETON = "singleton";
     static final String PROPERTY = "property";
-    static final String CONSTRUCTOR_ARG="constructor-arg";
-    static final String CONTROLLER="controller";
-    static final String INTERCEPTOR="interceptor";
-    static final String REMOTE="remote";
+    static final String CONSTRUCTOR_ARG = "constructor-arg";
+    static final String CONTROLLER = "controller";
+    static final String INTERCEPTOR = "interceptor";
+    static final String REMOTE = "remote";
 
     /**
      * bean definition缓存
@@ -94,11 +93,11 @@ class ParseContext {
 
     @SuppressWarnings("unchecked")
     public <T> T getBean(SYS_OBJECT_NAME objectName) {
-        String defaultBeanName=StringUtility.toHump(objectName.name().toLowerCase(),"_");
-        String beanName = Config.getValue(objectName.name().toLowerCase(),defaultBeanName);
+        String defaultBeanName = StringUtility.toHump(objectName.name().toLowerCase(), "_");
+        String beanName = Config.getValue(objectName.name().toLowerCase(), defaultBeanName);
         T obj = this.getBean(beanName);
         if (obj == null) {
-            throw new RuntimeException(beanName + "not exist,please config ["+defaultBeanName+"] in "+this.systemConfigPath);
+            throw new RuntimeException(beanName + "not exist,please config [" + defaultBeanName + "] in " + this.systemConfigPath);
         }
         return obj;
     }
@@ -121,7 +120,7 @@ class ParseContext {
         try {
             // 类的元数据
             BeanDefinition beanDefinition = this.beanDefinitionMap
-                    .get(beanName);
+                .get(beanName);
             // 获取当前类
             Class<?> beanClass = beanDefinition.getBeanClass();
             // 初始化当前对象
@@ -134,7 +133,7 @@ class ParseContext {
             // 注入依赖对象
             if (beanDefinition.getRelyOnClass().size() != 0) {
                 Iterator<String> bit = beanDefinition.getRelyOnClass()
-                        .keySet().iterator();
+                    .keySet().iterator();
                 String key;
                 while (bit.hasNext()) {
                     key = bit.next();
@@ -151,11 +150,11 @@ class ParseContext {
      * 注入
      *
      * @param currentObject 对象
-     * @param beanName      依赖bean name
-     * @param reference     依赖的bean
+     * @param beanName 依赖bean name
+     * @param reference 依赖的bean
      */
     <T> void setReference(T currentObject, String beanName, T reference)
-            throws Exception {
+        throws Exception {
         // set bean class
         Class<?> setBeanClazz = null;
         if (reference != null) {
@@ -178,20 +177,20 @@ class ParseContext {
             for (Class<?> interfaceClazz : interfaces) {
                 try {
                     method = currentClass.getMethod(setBeanMethod,
-                            interfaceClazz);
+                        interfaceClazz);
                     break;
                 } catch (NoSuchMethodException ex) {
                     Class<?>[] superClass = interfaceClazz.getInterfaces();
                     if (superClass != null && superClass.length > 0) {
                         try {
                             method = currentClass.getMethod(setBeanMethod,
-                                    superClass[0]);
+                                superClass[0]);
                         } catch (NoSuchMethodException e1) {
                             logger.error(setBeanMethod
-                                    + " method not found!", e1);
+                                + " method not found!", e1);
                         } catch (NullPointerException e2) {
                             logger.error(interfaceClazz
-                                    + " interface not found!", e2);
+                                + " interface not found!", e2);
                         }
                     }
                 }
@@ -206,67 +205,47 @@ class ParseContext {
      * 注入
      *
      * @param currentObject 对象
-     * @param propertyName  依赖
-     * @param value         value placeHolderKey place hold key 由maven pom 管理
+     * @param propertyName 依赖
+     * @param value value placeHolderKey place hold key 由maven pom 管理
      */
     <T> void setValue(T currentObject, String propertyName,
-                      String value) throws InvocationTargetException, IllegalAccessException {
+        String value) throws InvocationTargetException, IllegalAccessException {
         // set方法
         String setBeanMethod = StringUtility.getSetMethodNameByField(propertyName);
         Class<?> currentClass = currentObject.getClass();
-
-        Method method;
-        try {
-            method = currentClass.getMethod(setBeanMethod, String.class);
-            method.invoke(currentObject, value);
-        } catch (NoSuchMethodException e) {
-            try {
-                method = currentClass.getMethod(setBeanMethod, Integer.class);
-                method.invoke(currentClass, Integer.valueOf(value));
-            } catch (NoSuchMethodException e2) {
-                try {
-                    method = currentClass.getMethod(setBeanMethod, Boolean.class);
-                    method.invoke(currentClass, Boolean.valueOf(value));
-                } catch (NoSuchMethodException e1) {
-                    logger.error("no method", e1);
-                }
+        Method[] methods = currentClass.getMethods();
+        for (Method method : methods) {
+            if (method.getName().startsWith(setBeanMethod)) {
+                Class parameterType = method.getParameterTypes()[0];
+                method.invoke(currentObject, new TypeConverter(parameterType).convert(value));
+                return;
             }
         }
     }
 
     protected Object getInstance(String constructorArg,
-                                 Class<?> beanClass) throws Exception {
+        Class<?> beanClass) throws Exception {
         if (StringUtility.isNullOrEmpty(constructorArg)) {
             return beanClass.newInstance();
         }
-        //是否存在对象
-        Object constructorObj = null;
-        Constructor constructor;
-        if (!constructorArg.contains(SYMBOL.COMMA)) {
-            constructorObj = this.getBean(constructorArg);
-        }
+        String[] argArray = constructorArg.split(SYMBOL.COMMA);
+        Constructor[] constructors = beanClass.getDeclaredConstructors();
 
-        //如果是对象
-        if (constructorObj != null) {
-            //是否有该对象的构造
-            constructor = beanClass.getConstructor(constructorObj.getClass());
-            if (constructor == null) {
-                constructor = beanClass.getConstructor(constructorObj.getClass().getInterfaces()[0]);
+        for (Constructor constructor : constructors) {
+            if (constructor.getParameterTypes().length != argArray.length) {
+                continue;
             }
-            if (constructor == null) {
-                constructor = beanClass.getConstructor(String.class);
-                if (constructor != null) {
-                    constructorObj = constructorArg;
+            Object[] args = new Object[argArray.length];
+            Class[] constructorParameterTypes = constructor.getParameterTypes();
+            for (int i = 0; i < constructorParameterTypes.length; i++) {
+                Object beanArg = this.getBean(argArray[i]);
+                if (beanArg.getClass().equals(constructorParameterTypes[i])) {
+                    args[i] = beanArg;
+                    continue;
                 }
+                args[i] = new TypeConverter(constructorParameterTypes[i]).convert(argArray[i]);
             }
-        } else {
-            constructor = beanClass.getConstructor(String.class);
-            if (constructor != null) {
-                constructorObj = constructorArg;
-            }
-        }
-        if (constructor != null) {
-            return constructor.newInstance(constructorObj);
+            return constructor.newInstance(args);
         }
         return null;
     }
@@ -308,7 +287,7 @@ class ParseContext {
     /**
      * bean definition cache
      *
-     * @param beanName  xml config
+     * @param beanName xml config
      * @param beanClass class
      */
     void cacheBeanDefinition(String beanName, Class beanClass) {
