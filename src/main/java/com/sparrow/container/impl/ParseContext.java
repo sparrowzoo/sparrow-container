@@ -60,6 +60,10 @@ class ParseContext {
     static final String BEANS = "beans";
     static final String SINGLETON = "singleton";
     static final String PROPERTY = "property";
+    static final String CONSTRUCTOR_ARG="constructor-arg";
+    static final String CONTROLLER="controller";
+    static final String INTERCEPTOR="interceptor";
+    static final String REMOTE="remote";
 
     /**
      * bean definition缓存

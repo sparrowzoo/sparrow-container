@@ -26,9 +26,10 @@ import org.w3c.dom.Element;
 import java.util.HashMap;
 
 /**
- * Created by haryy on 2018/1/19.
+ * @author haryy
+ * @date 2018/1/19
  */
-public class DocumentParser extends ParseContext{
+public class DocumentParser extends ParseContext {
 
     protected void parseProperty(Element element) throws Exception {
         String propertyName = element.getAttribute(NAME).trim();
@@ -88,13 +89,13 @@ public class DocumentParser extends ParseContext{
         // class名
         String className = element.getAttribute(CLASS_NAME);
         //构造参数
-        String constructorArg = element.getAttribute("constructor-arg");
+        String constructorArg = element.getAttribute(CONSTRUCTOR_ARG);
         //controller名
-        String controller = element.getAttribute("controller");
+        String controller = element.getAttribute(CONTROLLER);
         //拦截器
-        String interceptor = element.getAttribute("interceptor");
+        String interceptor = element.getAttribute(INTERCEPTOR);
         //远程bean
-        String remote = element.getAttribute("remote");
+        String remote = element.getAttribute(REMOTE);
 
         String container = null;
 
