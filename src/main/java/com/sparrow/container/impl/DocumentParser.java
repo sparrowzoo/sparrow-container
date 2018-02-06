@@ -31,7 +31,7 @@ import java.util.HashMap;
  */
 public class DocumentParser extends ParseContext {
 
-    protected void parseProperty(Element element) throws Exception {
+    void parseProperty(Element element) throws Exception {
         String propertyName = element.getAttribute(NAME).trim();
         String refBeanName = element.getAttribute(REF);
         String value = element.getAttribute(VALUE);
@@ -83,7 +83,7 @@ public class DocumentParser extends ParseContext {
     /**
      * 读xml标签初始化bean 并加入到bean factory 和bean definition factory
      */
-    protected Object parseBean(Element element, String beanName) {
+    Object parseBean(Element element, String beanName) {
         // 是否为单子实例
         String scope = element.getAttribute(SCOPE);
         // class名
