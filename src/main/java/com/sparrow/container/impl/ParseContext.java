@@ -78,6 +78,16 @@ class ParseContext {
      * impl 生成的代理bean的缓存
      */
     final Map<String, MethodAccessor> proxyBeanCache = new ConcurrentHashMap<String, MethodAccessor>();
+
+    /**
+     * 对象的set方法缓存
+     */
+    final Map<String, List<Method>> setMethods = new ConcurrentHashMap<String, List<Method>>();
+
+    /**
+     * 对象的get方法缓存
+     */
+    final Map<String, List<Method>> getMethods = new ConcurrentHashMap<String, List<Method>>();
     /**
      * 实体的field 访问方法缓存
      */
@@ -120,7 +130,7 @@ class ParseContext {
         try {
             // 类的元数据
             BeanDefinition beanDefinition = this.beanDefinitionMap
-                .get(beanName);
+                    .get(beanName);
             // 获取当前类
             Class<?> beanClass = beanDefinition.getBeanClass();
             // 初始化当前对象
@@ -133,7 +143,7 @@ class ParseContext {
             // 注入依赖对象
             if (beanDefinition.getRelyOnClass().size() != 0) {
                 Iterator<String> bit = beanDefinition.getRelyOnClass()
-                    .keySet().iterator();
+                        .keySet().iterator();
                 String key;
                 while (bit.hasNext()) {
                     key = bit.next();
@@ -150,53 +160,23 @@ class ParseContext {
      * 注入
      *
      * @param currentObject 对象
-     * @param beanName 依赖bean name
-     * @param reference 依赖的bean
+     * @param beanName      依赖bean name
+     * @param reference     依赖的bean
      */
     <T> void setReference(T currentObject, String beanName, T reference)
-        throws Exception {
-        // set bean class
-        Class<?> setBeanClazz = null;
-        if (reference != null) {
-            setBeanClazz = reference.getClass();
-        }
-        if (setBeanClazz == null) {
-            setBeanClazz = this.beanFactoryCache.get(beanName).getClass();
-        }
+            throws Exception {
         Class<?> currentClass = currentObject.getClass();
-        Method method = null;
-        // set method name
+        List<Method> methods = this.setMethods.get(currentClass.getSimpleName());
+        // set方法
         String setBeanMethod = StringUtility.getSetMethodNameByField(beanName);
-        try {
-            method = currentClass.getMethod(setBeanMethod, setBeanClazz);
-        } catch (NoSuchMethodException e) {
-            Class<?>[] interfaces = setBeanClazz.getInterfaces();
-            if (interfaces.length == 0 && setBeanClazz.getSuperclass() != null) {
-                interfaces = setBeanClazz.getSuperclass().getInterfaces();
+        for (Method method : methods) {
+            if (!method.getName().equals(setBeanMethod)) {
+                continue;
             }
-            for (Class<?> interfaceClazz : interfaces) {
-                try {
-                    method = currentClass.getMethod(setBeanMethod,
-                        interfaceClazz);
-                    break;
-                } catch (NoSuchMethodException ex) {
-                    Class<?>[] superClass = interfaceClazz.getInterfaces();
-                    if (superClass != null && superClass.length > 0) {
-                        try {
-                            method = currentClass.getMethod(setBeanMethod,
-                                superClass[0]);
-                        } catch (NoSuchMethodException e1) {
-                            logger.error(setBeanMethod
-                                + " method not found!", e1);
-                        } catch (NullPointerException e2) {
-                            logger.error(interfaceClazz
-                                + " interface not found!", e2);
-                        }
-                    }
-                }
+            Class parameterType = method.getParameterTypes()[0];
+            if (!parameterType.isAssignableFrom(reference.getClass())) {
+                continue;
             }
-        }
-        if (method != null) {
             method.invoke(currentObject, reference);
         }
     }
@@ -205,32 +185,32 @@ class ParseContext {
      * 注入
      *
      * @param currentObject 对象
-     * @param propertyName 依赖
-     * @param value value placeHolderKey place hold key 由maven pom 管理
+     * @param propertyName  依赖
+     * @param value         value placeHolderKey place hold key 由maven pom 管理
      */
     <T> void setValue(T currentObject, String propertyName,
-        String value) throws InvocationTargetException, IllegalAccessException {
+                      String value) throws InvocationTargetException, IllegalAccessException {
         // set方法
         String setBeanMethod = StringUtility.getSetMethodNameByField(propertyName);
         Class<?> currentClass = currentObject.getClass();
-        Method[] methods = currentClass.getMethods();
+        List<Method> methods = this.setMethods.get(currentClass.getSimpleName());
         for (Method method : methods) {
-            if (method.getName().startsWith(setBeanMethod)) {
-                Class parameterType = method.getParameterTypes()[0];
-                method.invoke(currentObject, new TypeConverter(parameterType).convert(value));
-                return;
+            if (!method.getName().equals(setBeanMethod)) {
+                continue;
             }
+            Class parameterType = method.getParameterTypes()[0];
+            method.invoke(currentObject, new TypeConverter(parameterType).convert(value));
+            return;
         }
     }
 
     protected Object getInstance(String constructorArg,
-        Class<?> beanClass) throws Exception {
+                                 Class<?> beanClass) throws Exception {
         if (StringUtility.isNullOrEmpty(constructorArg)) {
             return beanClass.newInstance();
         }
         String[] argArray = constructorArg.split(SYMBOL.COMMA);
-        Constructor[] constructors = beanClass.getDeclaredConstructors();
-
+        Constructor[] constructors = beanClass.getConstructors();
         for (Constructor constructor : constructors) {
             if (constructor.getParameterTypes().length != argArray.length) {
                 continue;
@@ -239,7 +219,7 @@ class ParseContext {
             Class[] constructorParameterTypes = constructor.getParameterTypes();
             for (int i = 0; i < constructorParameterTypes.length; i++) {
                 Object beanArg = this.getBean(argArray[i]);
-                if (beanArg.getClass().equals(constructorParameterTypes[i])) {
+                if (beanArg != null && beanArg.getClass().equals(constructorParameterTypes[i])) {
                     args[i] = beanArg;
                     continue;
                 }
@@ -270,7 +250,7 @@ class ParseContext {
         if (!Boolean.TRUE.toString().equalsIgnoreCase(controller)) {
             return;
         }
-        Method[] methods = beanClass.getDeclaredMethods();
+        Method[] methods = beanClass.getMethods();
         Map<String, Method> methodMap = new HashMap<String, Method>(methods.length);
         for (Method method : methods) {
             if (method.getModifiers() == Modifier.PRIVATE) {
@@ -284,10 +264,25 @@ class ParseContext {
         this.controllerMethodCache.put(beanName, methodMap);
     }
 
+    void cacheGetAndSetMethods(Class beanClass) {
+        Method[] methods = beanClass.getMethods();
+        List<Method> setMethods = new ArrayList<Method>(methods.length / 2);
+        List<Method> getMethods = new ArrayList<Method>(methods.length / 2);
+        for (Method method : methods) {
+            if (method.getName().startsWith("set")) {
+                setMethods.add(method);
+                continue;
+            }
+            getMethods.add(method);
+        }
+        this.setMethods.put(beanClass.getSimpleName(), setMethods);
+        this.getMethods.put(beanClass.getSimpleName(), getMethods);
+    }
+
     /**
      * bean definition cache
      *
-     * @param beanName xml config
+     * @param beanName  xml config
      * @param beanClass class
      */
     void cacheBeanDefinition(String beanName, Class beanClass) {
@@ -301,7 +296,7 @@ class ParseContext {
         // 初始化bean 的get set 方法
         // 初始化bean 的get set 方法
         List<TypeConverter> typeConverterList = new ArrayList<TypeConverter>();
-        Method[] methods = beanClass.getDeclaredMethods();
+        Method[] methods = beanClass.getMethods();
         for (Method method : methods) {
             String methodName = method.getName();
             if (methodName.startsWith("get")) {

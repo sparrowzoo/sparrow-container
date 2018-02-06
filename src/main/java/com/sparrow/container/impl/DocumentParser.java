@@ -106,17 +106,21 @@ public class DocumentParser extends ParseContext {
             logger.error("bean name error :" + beanName, e);
             return null;
         }
-        // 如果是单例对象
+
         if (!StringUtility.isNullOrEmpty(scope) && !SINGLETON.equalsIgnoreCase(scope)) {
             // 如果不是单例则缓存该类的元数据
             this.cacheBeanDefinition(beanName, beanClass);
             return null;
         }
         try {
+            // 如果是单例对象
             Object instance = getInstance(constructorArg, beanClass);
             if (instance == null) {
                 return null;
             }
+
+            //缓存当前对象的get set方法
+            this.cacheGetAndSetMethods(beanClass);
             assembleController(beanName, controller, beanClass);
             //为与sparrow mvc解耦，这里引不到handlerInterceptor接口
             if (Boolean.TRUE.toString().equalsIgnoreCase(interceptor)) {
