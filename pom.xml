@@ -33,10 +33,6 @@
             <artifactId>sparrow</artifactId>
             <version>${sparrow_version}</version>
         </dependency>
-        <dependency>
-            <groupId>javax.servlet</groupId>
-            <artifactId>javax.servlet-api</artifactId>
-        </dependency>
     </dependencies>
     <build>
         <finalName>${project.artifactId}</finalName>
