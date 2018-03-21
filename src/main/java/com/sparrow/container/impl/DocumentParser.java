@@ -58,7 +58,6 @@ public class DocumentParser extends ParseContext {
                 .put(refBeanName, beanDefinition);
     }
 
-
     private void setSingletonProperty(String propertyName, String refBeanName, String value, String parentBeanName) throws Exception {
         Object parent = this.getBean(parentBeanName);
         if (StringUtility.isNullOrEmpty(refBeanName)) {
