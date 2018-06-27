@@ -86,7 +86,7 @@ public class SparrowContainerImpl extends DocumentParser implements Container {
             this.parseProperty(element);
             return;
         }
-        //-<import resource="dao.xml"/>-->
+        //-<import resource="repository.xml"/>-->
         if (IMPORT.equalsIgnoreCase(tagName)) {
             String resource = element.getAttribute("resource");
             if (!resource.startsWith(SYMBOL.SLASH)) {
