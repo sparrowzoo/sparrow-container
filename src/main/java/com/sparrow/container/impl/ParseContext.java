@@ -19,6 +19,7 @@ package com.sparrow.container.impl;
 
 import com.sparrow.cg.Generator4MethodAccessor;
 import com.sparrow.cg.MethodAccessor;
+import com.sparrow.cg.PropertyNamer;
 import com.sparrow.constant.SYS_OBJECT_NAME;
 import com.sparrow.constant.magic.SYMBOL;
 import com.sparrow.container.BeanDefinition;
@@ -169,7 +170,7 @@ class ParseContext {
         Class<?> currentClass = currentObject.getClass();
         List<Method> methods = this.setMethods.get(currentClass.getSimpleName());
         // set方法
-        String setBeanMethod = StringUtility.getSetMethodNameByField(beanName);
+        String setBeanMethod =PropertyNamer.setter(beanName);
         for (Method method : methods) {
             if (!method.getName().equals(setBeanMethod)) {
                 continue;
@@ -192,7 +193,7 @@ class ParseContext {
     <T> void setValue(T currentObject, String propertyName,
                       String value) throws InvocationTargetException, IllegalAccessException {
         // set方法
-        String setBeanMethod = StringUtility.getSetMethodNameByField(propertyName);
+        String setBeanMethod =PropertyNamer.setter(propertyName);
         Class<?> currentClass = currentObject.getClass();
         List<Method> methods = this.setMethods.get(currentClass.getSimpleName());
         for (Method method : methods) {
@@ -270,7 +271,7 @@ class ParseContext {
         List<Method> setMethods = new ArrayList<Method>(methods.length / 2);
         List<Method> getMethods = new ArrayList<Method>(methods.length / 2);
         for (Method method : methods) {
-            if (method.getName().startsWith("set")) {
+            if (PropertyNamer.isSetter(method.getName())) {
                 setMethods.add(method);
                 continue;
             }
