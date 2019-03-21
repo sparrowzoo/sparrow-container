@@ -26,10 +26,10 @@ import com.sparrow.container.Container;
 import com.sparrow.container.ContainerAware;
 import com.sparrow.core.TypeConverter;
 import com.sparrow.enums.CONTAINER;
+import com.sparrow.protocol.Result;
 import com.sparrow.support.Initializer;
 import com.sparrow.support.Login;
 import com.sparrow.support.LoginDialog;
-import com.sparrow.support.protocol.Result;
 import com.sparrow.utility.Config;
 import com.sparrow.utility.StringUtility;
 import com.sparrow.utility.Xml;
@@ -48,17 +48,17 @@ import java.util.Map;
  */
 public class SparrowContainerImpl extends DocumentParser implements Container {
 
-    public SparrowContainerImpl(String xmlName,String systemConfigPath) {
-        this.xmlName =xmlName;
+    public SparrowContainerImpl(String xmlName, String systemConfigPath) {
+        this.xmlName = xmlName;
         this.systemConfigPath = systemConfigPath;
     }
 
     public SparrowContainerImpl(String xmlName) {
-        this(xmlName,"/system_config.properties");
+        this(xmlName, "/system_config.properties");
     }
 
     public SparrowContainerImpl() {
-        this("/beans.xml","/system_config.properties");
+        this("/beans.xml", "/system_config.properties");
     }
 
     private void parseElement(Element element) throws Exception {
@@ -134,18 +134,19 @@ public class SparrowContainerImpl extends DocumentParser implements Container {
     public Map<String, Object> getAllBean() {
         return this.beanFactoryCache;
     }
+
     @Override
-    public void init(){
-        this.init(null,null);
+    public void init() {
+        this.init(null, null);
     }
 
     @Override
     public void init(String xmlName, String systemConfigPath) {
-        if(!StringUtility.isNullOrEmpty(xmlName)){
-            this.xmlName=xmlName;
+        if (!StringUtility.isNullOrEmpty(xmlName)) {
+            this.xmlName = xmlName;
         }
-        if(!StringUtility.isNullOrEmpty(systemConfigPath)){
-            this.systemConfigPath=systemConfigPath;
+        if (!StringUtility.isNullOrEmpty(systemConfigPath)) {
+            this.systemConfigPath = systemConfigPath;
         }
         logger.info("-----------------Ioc container init ....-------------------");
         try {
