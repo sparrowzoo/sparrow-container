@@ -109,7 +109,7 @@ class ParseContext {
         String beanName = Config.getValue(objectName.name().toLowerCase(), defaultBeanName);
         T obj = this.getBean(beanName);
         if (obj == null) {
-            throw new RuntimeException(beanName + "not exist,please config [" + defaultBeanName + "] in " + this.systemConfigPath);
+            throw new RuntimeException(beanName + " not exist,please config [" + defaultBeanName + "] in " + this.systemConfigPath);
         }
         return obj;
     }
