@@ -28,7 +28,7 @@ import com.sparrow.core.TypeConverter;
 import com.sparrow.enums.CONTAINER;
 import com.sparrow.protocol.Result;
 import com.sparrow.support.Initializer;
-import com.sparrow.support.Login;
+import com.sparrow.support.LoginParser;
 import com.sparrow.support.LoginDialog;
 import com.sparrow.utility.Config;
 import com.sparrow.utility.StringUtility;
@@ -170,7 +170,7 @@ public class SparrowContainerImpl extends DocumentParser implements Container {
             logger.error("ioc init error", e);
         } finally {
             this.cacheBeanDefinition("result", Result.class);
-            this.cacheBeanDefinition("login", Login.class);
+            this.cacheBeanDefinition("login", LoginParser.class);
             this.cacheBeanDefinition("loginDialog", LoginDialog.class);
         }
     }
