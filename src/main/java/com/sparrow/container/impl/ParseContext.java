@@ -258,6 +258,9 @@ class ParseContext {
             if (method.getModifiers() == Modifier.PRIVATE) {
                 continue;
             }
+            if(method.getDeclaringClass().equals(Object.class)){
+                continue;
+            }
             if (methodMap.containsKey(method.getName())) {
                 throw new DuplicateActionMethodException("Duplicate for the method name " + beanName + " " + method.getName() + "!");
             }
