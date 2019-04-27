@@ -17,7 +17,7 @@
 
 package com.sparrow.container.impl;
 
-import com.sparrow.constant.magic.SYMBOL;
+import com.sparrow.protocol.constant.magic.SYMBOL;
 import com.sparrow.container.BeanDefinition;
 import com.sparrow.enums.CONTAINER;
 import com.sparrow.utility.StringUtility;

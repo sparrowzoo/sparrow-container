@@ -19,9 +19,9 @@ package com.sparrow.container.impl;
 
 import com.sparrow.cg.MethodAccessor;
 import com.sparrow.constant.CONFIG;
-import com.sparrow.constant.CONSTANT;
+import com.sparrow.protocol.constant.CONSTANT;
 import com.sparrow.constant.SYS_OBJECT_NAME;
-import com.sparrow.constant.magic.SYMBOL;
+import com.sparrow.protocol.constant.magic.SYMBOL;
 import com.sparrow.container.Container;
 import com.sparrow.container.ContainerAware;
 import com.sparrow.core.TypeConverter;

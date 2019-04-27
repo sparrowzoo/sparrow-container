@@ -21,7 +21,7 @@ import com.sparrow.cg.Generator4MethodAccessor;
 import com.sparrow.cg.MethodAccessor;
 import com.sparrow.cg.PropertyNamer;
 import com.sparrow.constant.SYS_OBJECT_NAME;
-import com.sparrow.constant.magic.SYMBOL;
+import com.sparrow.protocol.constant.magic.SYMBOL;
 import com.sparrow.container.BeanDefinition;
 import com.sparrow.core.TypeConverter;
 import com.sparrow.exception.DuplicateActionMethodException;
@@ -126,7 +126,7 @@ class ParseContext {
         }
         // 如果没有被初始化获取该类的元数据
         if (this.beanDefinitionMap.get(beanName) == null) {
-            logger.warn(beanName + " object null at SparrowContainerImpl");
+            logger.warn(beanName + " bean defination is  null at ParseContext");
             return null;
         }
         try {
