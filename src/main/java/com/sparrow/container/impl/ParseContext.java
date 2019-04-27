@@ -126,7 +126,7 @@ class ParseContext {
         }
         // 如果没有被初始化获取该类的元数据
         if (this.beanDefinitionMap.get(beanName) == null) {
-            logger.warn(beanName + " object null at SparrowContainerImpl");
+            logger.warn(beanName + " bean defination is  null at ParseContext");
             return null;
         }
         try {
@@ -256,6 +256,9 @@ class ParseContext {
         Map<String, Method> methodMap = new HashMap<String, Method>(methods.length);
         for (Method method : methods) {
             if (method.getModifiers() == Modifier.PRIVATE) {
+                continue;
+            }
+            if(method.getDeclaringClass().equals(Object.class)){
                 continue;
             }
             if (methodMap.containsKey(method.getName())) {
