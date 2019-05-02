@@ -17,7 +17,9 @@
 
 package com.sparrow.container;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -30,22 +32,55 @@ public class BeanDefinition {
     /**
      * 类名
      */
-    private Class<?> beanClass;
+    private String className;
 
     /**
      * 类的依赖
      */
-    private Map<String, BeanDefinition> relyOnClass = new HashMap<String, BeanDefinition>();
+    private List<String> relyOnClass = new ArrayList<>(8);
 
-    public BeanDefinition(Class beanClass) {
-        this.beanClass = beanClass;
-    }
 
-    public Map<String, BeanDefinition> getRelyOnClass() {
+    private List<String> relyProperties=new ArrayList<>(8);
+
+
+    private String scope;
+
+    private String constructorArg;
+
+    private Boolean controller=false;
+
+    private Boolean interceptor =false;
+
+
+    public List<String> getRelyOnClass() {
         return relyOnClass;
     }
 
-    public Class<?> getBeanClass() {
-        return beanClass;
+    public void setRelyOnClass(List<String> relyOnClass) {
+        this.relyOnClass = relyOnClass;
+    }
+
+    public List<String> getRelyProperties() {
+        return relyProperties;
+    }
+
+    public void setRelyProperties(List<String> relyProperties) {
+        this.relyProperties = relyProperties;
+    }
+
+    public String getClassName() {
+        return className;
+    }
+
+    public void setClassName(String className) {
+        this.className = className;
+    }
+
+    public String getScope() {
+        return scope;
+    }
+
+    public void setScope(String scope) {
+        this.scope = scope;
     }
 }
