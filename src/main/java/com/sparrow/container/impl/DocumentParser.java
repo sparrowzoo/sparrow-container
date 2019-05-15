@@ -50,12 +50,12 @@ public class DocumentParser extends ParseContext {
         BeanDefinition beanDefinition = this.beanDefinitionMap
                 .get(refBeanName);
         if (beanDefinition == null) {
-            beanDefinition = new BeanDefinition(this.getBean(refBeanName)
-                    .getClass());
+            beanDefinition =null; //new BeanDefinition(this.getBean(refBeanName)
+                    //.getClass());
         }
         // 获取依赖类并压入缓存
-        this.beanDefinitionMap.get(parentBeanName).getRelyOnClass()
-                .put(refBeanName, beanDefinition);
+        //this.beanDefinitionMap.get(parentBeanName).getRelyOnClass()
+        //        .put(refBeanName, beanDefinition);
     }
 
     private void setSingletonProperty(String propertyName, String refBeanName, String value, String parentBeanName) throws Exception {

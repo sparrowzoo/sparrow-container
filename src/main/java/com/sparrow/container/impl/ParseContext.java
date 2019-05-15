@@ -134,7 +134,7 @@ class ParseContext {
             BeanDefinition beanDefinition = this.beanDefinitionMap
                     .get(beanName);
             // 获取当前类
-            Class<?> beanClass = beanDefinition.getBeanClass();
+            Class<?> beanClass =null;// beanDefinition.getBeanClass();
             // 初始化当前对象
             T currentObject = (T) beanClass.newInstance();
             // 初始化失败
@@ -144,8 +144,8 @@ class ParseContext {
             }
             // 注入依赖对象
             if (beanDefinition.getRelyOnClass().size() != 0) {
-                Iterator<String> bit = beanDefinition.getRelyOnClass()
-                        .keySet().iterator();
+                Iterator<String> bit =null;// beanDefinition.getRelyOnClass()
+                        //.keySet().iterator();
                 String key;
                 while (bit.hasNext()) {
                     key = bit.next();
@@ -292,7 +292,7 @@ class ParseContext {
      */
     void cacheBeanDefinition(String beanName, Class beanClass) {
         String clazzName = beanClass.getSimpleName();
-        BeanDefinition beanDefinition = new BeanDefinition(beanClass);
+        BeanDefinition beanDefinition = new BeanDefinition();
         this.beanDefinitionMap.put(beanName, beanDefinition);
         // 如果是非单例对象则生成代理访问对象，提高反射效率
         // 除实体对象外全部为非单例对象
