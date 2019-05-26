@@ -143,8 +143,8 @@ public abstract class AbstractContainer implements Container {
                  value=new TypeConverter(valueHolder.getName(),value,clazz).convert();
              }
 
-             types[index] = clazz;
-             args[index] = value;
+             types[index-1] = clazz;
+             args[index-1] = value;
          }
 
          return Pair.create(types, args);

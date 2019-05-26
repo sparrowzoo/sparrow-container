@@ -73,7 +73,7 @@ public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
 
     @Override public void loadBeanDefinitions(String xmlFileName) throws Exception {
         DocumentLoader documentLoader = new DefaultDocumentLoader();
-        Document doc = documentLoader.loadDocument(xmlFileName, new DtdSchemaResolverAdapter(), true);
+        Document doc = documentLoader.loadDocument(xmlFileName,false);
         this.beforeParse(xmlFileName);
         this.parse(doc.getDocumentElement());
         this.afterParse(xmlFileName);

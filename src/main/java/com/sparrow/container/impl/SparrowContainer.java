@@ -6,6 +6,7 @@ import com.sparrow.container.AbstractContainer;
 import com.sparrow.container.BeanDefinition;
 import com.sparrow.container.BeanDefinitionParserDelegate;
 import com.sparrow.container.BeanDefinitionReader;
+import com.sparrow.container.ContainerAware;
 import com.sparrow.container.SimpleBeanDefinitionRegistry;
 import com.sparrow.container.XmlBeanDefinitionReader;
 import com.sparrow.protocol.LoginToken;
@@ -68,6 +69,10 @@ public class SparrowContainer extends AbstractContainer {
                     }
                     if(bd.isInterceptor()){
                         this.interceptorRegistry.pubObject(beanName,(HandlerInterceptor) o);
+                    }
+                    if(o instanceof ContainerAware){
+                        ContainerAware containerAware=(ContainerAware)o;
+                        containerAware.aware(this,beanName);
                     }
                 }
                 else
