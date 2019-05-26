@@ -1,6 +1,7 @@
 package com.sparrow.container;
 
 import com.sparrow.exception.Asserts;
+import com.sparrow.protocol.constant.magic.SYMBOL;
 import com.sparrow.utility.StringUtility;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -147,6 +148,12 @@ public class BeanDefinitionParserDelegate {
 
         if (hasValueAttribute) {
             String value = ele.getAttribute(VALUE_ATTRIBUTE);
+            if(StringUtility.isNullOrEmpty(typeAttr)){
+                typeAttr="java.lang.String";
+            }
+            if(!typeAttr.contains(SYMBOL.DOT)){
+                typeAttr="java.lang."+StringUtility.setFirstByteUpperCase(typeAttr);
+            }
             return new ValueHolder(name, value, Class.forName(typeAttr), false);
         }
         return null;
