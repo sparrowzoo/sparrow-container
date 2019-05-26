@@ -40,9 +40,10 @@
         , - 列出的元素必须按照指定的顺序出现。
         -->
         <!ELEMENT beans (import|bean)*>
-        <!ELEMENT bean (property*)>
+        <!ELEMENT bean (property|constructor-arg)*>
         <!ELEMENT import (#PCDATA)>
         <!ELEMENT property (#PCDATA)>
+        <!ELEMENT constructor-arg (#PCDATA)>
 
         <!ATTLIST bean
                 name   ID #REQUIRED
@@ -51,15 +52,25 @@
                 interceptor (true|false) #IMPLIED
                 interface    CDATA #IMPLIED
                 scope (prototype|singleton) #IMPLIED
-                constructor-arg CDATA #IMPLIED
                 remote (sparrow|dubble|rmi) #IMPLIED
-                place-holder-key CDATA #IMPLIED
                 >
+
+
+
         <!ATTLIST property
                 name CDATA #REQUIRED
                 ref  IDREF #IMPLIED
                 value  CDATA #IMPLIED
+                placeholder CDATA #IMPLIED
                 >
+
+        <!ATTLIST constructor-arg
+            index CDATA #REQUIRED
+            name CDATA #REQUIRED
+            ref  IDREF #IMPLIED
+            value  CDATA #IMPLIED
+            type CDATA #IMPLIED
+            >
 
         <!ATTLIST import
                 resource CDATA #REQUIRED

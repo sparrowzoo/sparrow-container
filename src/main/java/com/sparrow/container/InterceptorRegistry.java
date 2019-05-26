@@ -1,6 +1,6 @@
 package com.sparrow.container;
 
-import com.sparrow.cg.MethodAccessor;
+import com.sparrow.protocol.mvn.HandlerInterceptor;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -8,25 +8,25 @@ import java.util.Map;
 /**
  * @author by harry
  */
-public class SimpleProxyBeanRegistry implements FactoryBean<MethodAccessor> {
-    private Map<String, MethodAccessor> map = new HashMap<>();
+public class InterceptorRegistry implements FactoryBean<HandlerInterceptor> {
 
-    @Override public void pubObject(String name, MethodAccessor o) {
-        this.map.put(name, o);
+    private Map<String,HandlerInterceptor> map=new HashMap();
+
+    @Override public void pubObject(String name, HandlerInterceptor interceptor) {
+this.map.put(name,interceptor);
     }
 
-    @Override public MethodAccessor getObject(String name) {
+    @Override public HandlerInterceptor getObject(String name) {
         return this.map.get(name);
     }
 
     @Override public Class<?> getObjectType() {
-        return MethodAccessor.class;
+        return Object.class;
     }
 
     @Override public void removeObject(String name) {
         this.map.remove(name);
     }
-
 
     @Override public Iterator<String> keyIterator(){
         return this.map.keySet().iterator();
