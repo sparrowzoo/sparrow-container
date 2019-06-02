@@ -59,7 +59,7 @@
 
         <!ATTLIST property
                 name CDATA #REQUIRED
-                ref  IDREF #IMPLIED
+                ref  CDATA #IMPLIED
                 value  CDATA #IMPLIED
                 placeholder CDATA #IMPLIED
                 >
@@ -67,7 +67,7 @@
         <!ATTLIST constructor-arg
             index CDATA #REQUIRED
             name CDATA #REQUIRED
-            ref  IDREF #IMPLIED
+            ref  CDATA #IMPLIED
             value  CDATA #IMPLIED
             type CDATA #IMPLIED
             >

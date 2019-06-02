@@ -28,7 +28,9 @@ public abstract class AbstractContainer implements Container {
 
     private Logger logger= LoggerFactory.getLogger(this.getClass());
 
-    protected String systemConfigPath;
+    protected String contextConfigLocation ="/beans.xml";
+    protected String configLocation ="/system_config.properties";
+
 
     protected SimpleSingletonRegistry singletonRegistry=new SimpleSingletonRegistry();
 
@@ -205,7 +207,7 @@ public abstract class AbstractContainer implements Container {
         String beanName = Config.getValue(objectName.name().toLowerCase(), defaultBeanName);
         T obj = this.getBean(beanName);
         if (obj == null) {
-            throw new RuntimeException(beanName + " not exist,please config [" + defaultBeanName + "] in " + this.systemConfigPath);
+            throw new RuntimeException(beanName + " not exist,please config [" + defaultBeanName + "] in " + this.contextConfigLocation);
         }
         return obj;
     }
@@ -259,5 +261,19 @@ public abstract class AbstractContainer implements Container {
         }
         this.controllerMethodCache.put(beanName, methodMap);
         this.controllerRegister.pubObject(beanName,o);
+    }
+
+    @Override public void setConfigLocation(String configLocation) {
+        if(StringUtility.isNullOrEmpty(configLocation)){
+            return;
+        }
+        this.configLocation = configLocation;
+    }
+
+    @Override public void setContextConfigLocation(String contextConfigLocation) {
+        if(StringUtility.isNullOrEmpty(contextConfigLocation)){
+            return;
+        }
+        this.contextConfigLocation = contextConfigLocation;
     }
 }

@@ -27,23 +27,8 @@ import org.slf4j.LoggerFactory;
  * @author by harry
  */
 public class SparrowContainer extends AbstractContainer {
-    private String xmlName;
-
-    private String systemConfigPath;
-
     private static Logger logger= LoggerFactory.getLogger(SparrowContainer.class);
-
     @Override public void init() {
-        this.init("/beans.xml", "/system_config.properties");
-    }
-
-    @Override public void init(String xmlName, String systemConfigPath) {
-        if (!StringUtility.isNullOrEmpty(xmlName)) {
-            this.xmlName = xmlName;
-        }
-        if (!StringUtility.isNullOrEmpty(systemConfigPath)) {
-            this.systemConfigPath = systemConfigPath;
-        }
         logger.info("----------------- container init ....-------------------");
         try {
             logger.info("-------------system config file init ...-------------------");
@@ -52,7 +37,7 @@ public class SparrowContainer extends AbstractContainer {
             SimpleBeanDefinitionRegistry registry=new SimpleBeanDefinitionRegistry();
             BeanDefinitionParserDelegate delegate=new BeanDefinitionParserDelegate();
             BeanDefinitionReader definitionReader=new XmlBeanDefinitionReader(registry,delegate);
-            definitionReader.loadBeanDefinitions(this.xmlName);
+            definitionReader.loadBeanDefinitions(this.contextConfigLocation);
 
             this.beanDefinitionRegistry=registry;
 
@@ -100,10 +85,10 @@ public class SparrowContainer extends AbstractContainer {
     }
 
     private void initSystemConfig() throws IOException {
-        if (StringUtility.isNullOrEmpty(this.systemConfigPath)) {
+        if (StringUtility.isNullOrEmpty(this.configLocation)) {
             return;
         }
-        Config.initSystem(this.systemConfigPath);
+        Config.initSystem(this.configLocation);
         String internationalization = Config
             .getValue(CONFIG.INTERNATIONALIZATION);
 
