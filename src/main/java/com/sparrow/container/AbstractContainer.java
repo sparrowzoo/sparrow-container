@@ -10,6 +10,7 @@ import com.sparrow.exception.DuplicateActionMethodException;
 import com.sparrow.utility.Config;
 import com.sparrow.utility.StringUtility;
 import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
@@ -153,8 +154,7 @@ public abstract class AbstractContainer implements Container {
      }
 
 
-    private  <T> void set(T currentObject, String beanName, Object val)
-        throws Exception {
+    private  <T> void set(T currentObject, String beanName, Object val){
         Class<?> currentClass = currentObject.getClass();
         List<Method> methods = this.setMethods.get(currentClass.getSimpleName());
         // set方法
@@ -163,31 +163,52 @@ public abstract class AbstractContainer implements Container {
             if (!method.getName().equals(setBeanMethod)) {
                 continue;
             }
-            Class parameterType = method.getParameterTypes()[0];
-            if (!parameterType.isAssignableFrom(val.getClass())) {
-
-                Object v = new TypeConverter("", val, parameterType).convert();
-                if (v == null) {
-                    continue;
-                } else {
-                    val = v;
+            try {
+                Class parameterType = method.getParameterTypes()[0];
+                if (!parameterType.isAssignableFrom(val.getClass())) {
+                    Object v = new TypeConverter("", val, parameterType).convert();
+                    if (v == null) {
+                        continue;
+                    } else {
+                        val = v;
+                    }
                 }
+                method.invoke(currentObject, val);
+            }catch (Throwable e){
+                logger.error("set ref error {}, bean name:{}",e,beanName);
             }
-            method.invoke(currentObject, val);
             return;
         }
     }
 
-    protected Object instance(BeanDefinition bd) throws Exception {
+    protected Object instance(BeanDefinition bd){
         Object instance=null;
-        Class clazz=Class.forName(bd.getBeanClassName());
+        Class clazz= null;
+        try {
+            clazz = Class.forName(bd.getBeanClassName());
+        } catch (ClassNotFoundException e) {
+            logger.error("class not found {},class name {}",e,bd.getBeanClassName());
+        }
         if(bd.getConstructorArgsMap()!=null&&bd.getConstructorArgsMap().size()>0){
             Pair<Class[],Object[]> pair=this.getConstructorTypes(bd);
-            Constructor constructor= clazz.getConstructor(pair.getFirst());
-            instance= constructor.newInstance(pair.getSecond());
+            Constructor constructor= null;
+            try {
+                constructor = clazz.getConstructor(pair.getFirst());
+            } catch (NoSuchMethodException e) {
+                logger.error("method not found {}, class {},arguments type {}",e,bd.getBeanClassName(),pair.getFirst());
+            }
+            try {
+                instance= constructor.newInstance(pair.getSecond());
+            } catch (Exception e) {
+                logger.error("instance error {}, class name {}",e,bd.getBeanClassName());
+            }
         }
         else {
-            instance= clazz.newInstance();
+            try {
+                instance= clazz.newInstance();
+            } catch (Exception e) {
+                logger.error("instance error {},class name {}",e,bd.getBeanClassName());
+            }
         }
 
         List<ValueHolder> valueHolders= bd.getPropertyValues();
