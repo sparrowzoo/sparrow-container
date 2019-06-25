@@ -84,7 +84,7 @@ public class SparrowContainer extends AbstractContainer {
         }
     }
 
-    private void initSystemConfig() throws IOException {
+    private void initSystemConfig(){
         if (StringUtility.isNullOrEmpty(this.configLocation)) {
             return;
         }
