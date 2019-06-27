@@ -228,7 +228,7 @@ public abstract class AbstractContainer implements Container {
         String beanName = Config.getValue(objectName.name().toLowerCase(), defaultBeanName);
         T obj = this.getBean(beanName);
         if (obj == null) {
-            throw new RuntimeException(beanName + " not exist,please config [" + defaultBeanName + "] in " + this.contextConfigLocation);
+            logger.warn(beanName + " not exist,please config [" + defaultBeanName + "] in " + this.contextConfigLocation);
         }
         return obj;
     }
