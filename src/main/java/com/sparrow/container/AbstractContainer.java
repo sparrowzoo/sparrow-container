@@ -141,6 +141,10 @@ public abstract class AbstractContainer implements Container {
              if (valueHolder.isRef()) {
                  value = singletonRegistry.getObject(value.toString());
                  clazz = value.getClass();
+                 //if has interface then use first interface
+                 if(clazz.getInterfaces().length>0){
+                     clazz=clazz.getInterfaces()[0];
+                 }
              }
              else {
                  value=new TypeConverter(valueHolder.getName(),value,clazz).convert();
