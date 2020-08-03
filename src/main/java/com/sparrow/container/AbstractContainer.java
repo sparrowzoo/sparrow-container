@@ -125,6 +125,7 @@ public abstract class AbstractContainer implements Container {
             o = (T) this.instance(bd);
         }
         catch (Throwable e){
+            logger.error("get bean error name {}",beanName);
             throw new RuntimeException(e);
         }
         return o;
