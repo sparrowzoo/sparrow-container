@@ -18,8 +18,10 @@ import com.sparrow.support.Initializer;
 import com.sparrow.support.LoginDialog;
 import com.sparrow.utility.Config;
 import com.sparrow.utility.StringUtility;
+
 import java.io.IOException;
 import java.util.Iterator;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,49 +29,53 @@ import org.slf4j.LoggerFactory;
  * @author by harry
  */
 public class SparrowContainer extends AbstractContainer {
-    private static Logger logger= LoggerFactory.getLogger(SparrowContainer.class);
-    @Override public void init() {
+    private static Logger logger = LoggerFactory.getLogger(SparrowContainer.class);
+
+    @Override
+    public void init() {
         logger.info("----------------- container init ....-------------------");
         try {
             logger.info("-------------system config file init ...-------------------");
             initSystemConfig();
             logger.info("-------------init bean ...---------------------------");
-            SimpleBeanDefinitionRegistry registry=new SimpleBeanDefinitionRegistry();
-            BeanDefinitionParserDelegate delegate=new BeanDefinitionParserDelegate();
-            BeanDefinitionReader definitionReader=new XmlBeanDefinitionReader(registry,delegate);
+            SimpleBeanDefinitionRegistry registry = new SimpleBeanDefinitionRegistry();
+            BeanDefinitionParserDelegate delegate = new BeanDefinitionParserDelegate();
+            BeanDefinitionReader definitionReader = new XmlBeanDefinitionReader(registry, delegate);
             definitionReader.loadBeanDefinitions(this.contextConfigLocation);
 
-            this.beanDefinitionRegistry=registry;
+            this.beanDefinitionRegistry = registry;
 
-            Iterator<String> iterator= registry.keyIterator();
-            while (iterator.hasNext()){
-                String beanName=iterator.next();
-                BeanDefinition bd=registry.getObject(beanName);
-                this.initMethod(bd);
-                if(bd.isSingleton()) {
-                    Object o = this.instance(bd);
-                    this.singletonRegistry.pubObject(beanName,o);
-                    if(bd.isController()){
-                        this.assembleController(beanName,o);
+            Iterator<String> iterator = registry.keyIterator();
+            while (iterator.hasNext()) {
+                String beanName = iterator.next();
+                try {
+                    BeanDefinition bd = registry.getObject(beanName);
+                    this.initMethod(bd);
+                    if (bd.isSingleton()) {
+                        Object o = this.instance(bd);
+                        this.singletonRegistry.pubObject(beanName, o);
+                        if (bd.isController()) {
+                            this.assembleController(beanName, o);
+                        }
+                        if (bd.isInterceptor()) {
+                            this.interceptorRegistry.pubObject(beanName, (HandlerInterceptor) o);
+                        }
+                        if (o instanceof ContainerAware) {
+                            ContainerAware containerAware = (ContainerAware) o;
+                            containerAware.aware(this, beanName);
+                        }
+                    } else {
+                        Class clazz = Class.forName(bd.getBeanClassName());
+                        this.initProxyBean(clazz);
                     }
-                    if(bd.isInterceptor()){
-                        this.interceptorRegistry.pubObject(beanName,(HandlerInterceptor) o);
-                    }
-                    if(o instanceof ContainerAware){
-                        ContainerAware containerAware=(ContainerAware)o;
-                        containerAware.aware(this,beanName);
-                    }
-                }
-                else
-                {
-                    Class clazz=Class.forName(bd.getBeanClassName());
-                    this.initProxyBean(clazz);
+                } catch (Throwable t) {
+                    logger.error("init bean error,bean-name {}", beanName);
                 }
             }
 
             logger.info("-------------init initializer ...--------------------------");
             Initializer initializer = this.getBean(
-                SYS_OBJECT_NAME.INITIALIZER);
+                    SYS_OBJECT_NAME.INITIALIZER);
 
             if (initializer != null) {
                 initializer.init(this);
@@ -84,23 +90,23 @@ public class SparrowContainer extends AbstractContainer {
         }
     }
 
-    private void initSystemConfig(){
+    private void initSystemConfig() {
         if (StringUtility.isNullOrEmpty(this.configLocation)) {
             return;
         }
         Config.initSystem(this.configLocation);
         String internationalization = Config
-            .getValue(CONFIG.INTERNATIONALIZATION);
+                .getValue(CONFIG.INTERNATIONALIZATION);
 
         if (StringUtility.isNullOrEmpty(internationalization)) {
             internationalization = Config
-                .getValue(CONFIG.LANGUAGE);
+                    .getValue(CONFIG.LANGUAGE);
         }
         if (StringUtility.isNullOrEmpty(internationalization)) {
             internationalization = CONSTANT.DEFAULT_LANGUAGE;
         }
         String[] internationalizationArray = internationalization
-            .split(SYMBOL.COMMA);
+                .split(SYMBOL.COMMA);
         for (String i18n : internationalizationArray) {
             Config.initInternationalization(i18n);
         }

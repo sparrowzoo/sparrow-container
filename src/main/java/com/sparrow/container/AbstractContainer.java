@@ -215,17 +215,20 @@ public abstract class AbstractContainer implements Container {
                 constructor = clazz.getConstructor(pair.getFirst());
             } catch (NoSuchMethodException e) {
                 logger.error("method not found {}, class {},arguments type {}", e, bd.getBeanClassName(), pair.getFirst());
+                return null;
             }
             try {
                 instance = constructor.newInstance(pair.getSecond());
             } catch (Exception e) {
                 logger.error("instance error {}, class name {}", e, bd.getBeanClassName());
+                return null;
             }
         } else {
             try {
                 instance = clazz.newInstance();
             } catch (Exception e) {
                 logger.error("instance error {},class name {}", e, bd.getBeanClassName());
+                return null;
             }
         }
 
@@ -233,7 +236,12 @@ public abstract class AbstractContainer implements Container {
         for (ValueHolder valueHolder : valueHolders) {
             Object value = valueHolder.getValue();
             if (valueHolder.isRef()) {
-                value = singletonRegistry.getObject(value.toString());
+                String refName = value.toString();
+                value = singletonRegistry.getObject(refName);
+                if (value == null) {
+                    logger.warn("{} ref is null", refName);
+                    continue;
+                }
             }
             this.set(instance, valueHolder.getName(), value);
         }
