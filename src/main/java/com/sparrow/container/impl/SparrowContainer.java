@@ -14,6 +14,7 @@ import com.sparrow.protocol.Result;
 import com.sparrow.protocol.constant.CONSTANT;
 import com.sparrow.protocol.constant.magic.SYMBOL;
 import com.sparrow.protocol.mvn.HandlerInterceptor;
+import com.sparrow.protocol.pager.PagerQuery;
 import com.sparrow.support.Initializer;
 import com.sparrow.support.LoginDialog;
 import com.sparrow.utility.Config;
@@ -87,6 +88,7 @@ public class SparrowContainer extends AbstractContainer {
             this.initProxyBean(Result.class);
             this.initProxyBean(LoginToken.class);
             this.initProxyBean(LoginDialog.class);
+            this.initProxyBean(PagerQuery.class);
         }
     }
 
