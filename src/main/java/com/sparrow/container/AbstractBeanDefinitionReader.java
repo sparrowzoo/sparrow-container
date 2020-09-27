@@ -16,7 +16,6 @@
 
 package com.sparrow.container;
 
-import java.io.InputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

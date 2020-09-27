@@ -13,14 +13,16 @@ import com.sparrow.protocol.LoginToken;
 import com.sparrow.protocol.Result;
 import com.sparrow.protocol.constant.CONSTANT;
 import com.sparrow.protocol.constant.magic.SYMBOL;
-import com.sparrow.protocol.mvn.HandlerInterceptor;
+import com.sparrow.protocol.dto.AuthorDTO;
+import com.sparrow.protocol.dto.ImageDTO;
+import com.sparrow.protocol.dto.SimpleItemDTO;
+import com.sparrow.protocol.mvc.HandlerInterceptor;
 import com.sparrow.protocol.pager.PagerQuery;
 import com.sparrow.support.Initializer;
 import com.sparrow.support.LoginDialog;
 import com.sparrow.utility.Config;
 import com.sparrow.utility.StringUtility;
 
-import java.io.IOException;
 import java.util.Iterator;
 
 import org.slf4j.Logger;
@@ -55,6 +57,9 @@ public class SparrowContainer extends AbstractContainer {
                     if (bd.isSingleton()) {
                         Object o = this.instance(bd);
                         this.singletonRegistry.pubObject(beanName, o);
+                        if (bd.alias() != null) {
+                            this.singletonRegistry.pubObject(bd.alias(), o);
+                        }
                         if (bd.isController()) {
                             this.assembleController(beanName, o);
                         }
@@ -89,6 +94,9 @@ public class SparrowContainer extends AbstractContainer {
             this.initProxyBean(LoginToken.class);
             this.initProxyBean(LoginDialog.class);
             this.initProxyBean(PagerQuery.class);
+            this.initProxyBean(AuthorDTO.class);
+            this.initProxyBean(ImageDTO.class);
+            this.initProxyBean(SimpleItemDTO.class);
         }
     }
 

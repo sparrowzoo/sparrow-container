@@ -36,4 +36,6 @@ public interface BeanDefinition {
     boolean isController();
 
     boolean isInterceptor();
+
+    String alias();
 }

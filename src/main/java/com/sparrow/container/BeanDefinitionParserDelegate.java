@@ -29,6 +29,9 @@ public class BeanDefinitionParserDelegate {
 
     public static final String NAME_ATTRIBUTE = "name";
 
+    public static final String ALIAS_ATTRIBUTE = "alias";
+
+
     public static final String BEAN_ELEMENT = "bean";
 
     public static final String ID_ATTRIBUTE = "id";
@@ -98,7 +101,7 @@ public class BeanDefinitionParserDelegate {
         if (element.hasAttribute(SCOPE_ATTRIBUTE)) {
             bd.setScope(element.getAttribute(SCOPE_ATTRIBUTE));
             bd.setSingleton(SCOPE_SINGLETON.equalsIgnoreCase(bd.getScope()));
-            bd.setPrototype(SCOPE_PROTOTYPE.equals(bd.getScope()));
+            bd.setPrototype(SCOPE_PROTOTYPE.equalsIgnoreCase(bd.getScope()));
         }
         else
         {
@@ -112,6 +115,10 @@ public class BeanDefinitionParserDelegate {
 
         if(element.hasAttribute(INTERCEPTOR_ATTRIBUTE)){
             bd.setInterceptor(TRUE_VALUE.equalsIgnoreCase(element.getAttribute(INTERCEPTOR_ATTRIBUTE)));
+        }
+
+        if(element.hasAttribute(ALIAS_ATTRIBUTE)){
+            bd.setAlias(element.getAttribute(ALIAS_ATTRIBUTE));
         }
     }
 
