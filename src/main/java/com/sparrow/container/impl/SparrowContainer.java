@@ -1,7 +1,7 @@
 package com.sparrow.container.impl;
 
-import com.sparrow.constant.CONFIG;
-import com.sparrow.constant.SYS_OBJECT_NAME;
+import com.sparrow.constant.Config;
+import com.sparrow.constant.SysObjectName;
 import com.sparrow.container.AbstractContainer;
 import com.sparrow.container.BeanDefinition;
 import com.sparrow.container.BeanDefinitionParserDelegate;
@@ -20,7 +20,6 @@ import com.sparrow.protocol.mvc.HandlerInterceptor;
 import com.sparrow.protocol.pager.PagerQuery;
 import com.sparrow.support.Initializer;
 import com.sparrow.support.LoginDialog;
-import com.sparrow.utility.Config;
 import com.sparrow.utility.StringUtility;
 
 import java.util.Iterator;
@@ -81,7 +80,7 @@ public class SparrowContainer extends AbstractContainer {
 
             logger.info("-------------init initializer ...--------------------------");
             Initializer initializer = this.getBean(
-                    SYS_OBJECT_NAME.INITIALIZER);
+                    SysObjectName.INITIALIZER);
 
             if (initializer != null) {
                 initializer.init(this);
@@ -104,13 +103,13 @@ public class SparrowContainer extends AbstractContainer {
         if (StringUtility.isNullOrEmpty(this.configLocation)) {
             return;
         }
-        Config.initSystem(this.configLocation);
-        String internationalization = Config
-                .getValue(CONFIG.INTERNATIONALIZATION);
+        com.sparrow.utility.Config.initSystem(this.configLocation);
+        String internationalization = com.sparrow.utility.Config
+                .getValue(Config.INTERNATIONALIZATION);
 
         if (StringUtility.isNullOrEmpty(internationalization)) {
-            internationalization = Config
-                    .getValue(CONFIG.LANGUAGE);
+            internationalization = com.sparrow.utility.Config
+                    .getValue(Config.LANGUAGE);
         }
         if (StringUtility.isNullOrEmpty(internationalization)) {
             internationalization = CONSTANT.DEFAULT_LANGUAGE;
@@ -118,7 +117,7 @@ public class SparrowContainer extends AbstractContainer {
         String[] internationalizationArray = internationalization
                 .split(SYMBOL.COMMA);
         for (String i18n : internationalizationArray) {
-            Config.initInternationalization(i18n);
+            com.sparrow.utility.Config.initInternationalization(i18n);
         }
     }
 }

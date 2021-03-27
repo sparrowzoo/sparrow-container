@@ -3,7 +3,7 @@ package com.sparrow.container;
 import com.sparrow.cg.Generator4MethodAccessor;
 import com.sparrow.cg.MethodAccessor;
 import com.sparrow.cg.PropertyNamer;
-import com.sparrow.constant.SYS_OBJECT_NAME;
+import com.sparrow.constant.SysObjectName;
 import com.sparrow.core.Pair;
 import com.sparrow.core.TypeConverter;
 import com.sparrow.exception.DuplicateActionMethodException;
@@ -11,7 +11,6 @@ import com.sparrow.utility.Config;
 import com.sparrow.utility.StringUtility;
 
 import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
@@ -250,7 +249,7 @@ public abstract class AbstractContainer implements Container {
 
 
     @Override
-    public <T> T getBean(SYS_OBJECT_NAME objectName) {
+    public <T> T getBean(SysObjectName objectName) {
         String defaultBeanName = StringUtility.toHump(objectName.name().toLowerCase(), "_");
         String beanName = Config.getValue(objectName.name().toLowerCase(), defaultBeanName);
         T obj = this.getBean(beanName);
